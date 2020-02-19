@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "Interceptor for the server to collect statistics of calls through Prometheus",
   "main": "./src/index.js",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "jest --verbose"
   },
@@ -19,5 +24,13 @@
   "bugs": {
     "url": "https://github.com/litichevskiydv/grpc-prometheus/issues"
   },
-  "homepage": "https://github.com/litichevskiydv/grpc-prometheus#readme"
+  "homepage": "https://github.com/litichevskiydv/grpc-prometheus#readme",
+  "peerDependencies": {
+    "grpc": "^1.24.2",
+    "prom-client": "^11.5.3"
+  },
+  "devDependencies": {
+    "grpc": "^1.24.2",
+    "prom-client": "^11.5.3"
+  }
 }
