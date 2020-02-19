@@ -1,0 +1,23 @@
+{
+  "name": "grpc-prometheus",
+  "version": "1.0.0",
+  "description": "Interceptor for the server to collect statistics of calls through Prometheus",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "jest --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/litichevskiydv/grpc-prometheus.git"
+  },
+  "keywords": [
+    "gRPC",
+    "Prometheus"
+  ],
+  "author": "Dmitriy Litichevskiy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/litichevskiydv/grpc-prometheus/issues"
+  },
+  "homepage": "https://github.com/litichevskiydv/grpc-prometheus#readme"
+}
