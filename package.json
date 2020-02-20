@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Interceptor for the server to collect statistics of calls through Prometheus",
   "main": "./src/index.js",
+  "types": "./src/index.d.ts",
   "files": [
     "src",
     "README.md",
