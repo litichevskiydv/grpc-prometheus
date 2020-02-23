@@ -12,7 +12,7 @@ interface InterceptorsFactoryOptions {
 }
 
 export function serverInterceptorsFactory(
-  options: InterceptorsFactoryOptions
+  options?: InterceptorsFactoryOptions
 ): (
   call: ServerUnaryCall<any> | ServerWritableStream<any> | ServerReadableStream<any> | ServerDuplexStream<any, any>,
   methodDefinition: MethodDefinition<any, any>,
