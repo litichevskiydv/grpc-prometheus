@@ -5,6 +5,7 @@ const { GrpcHostBuilder } = require("grpc-host-builder");
 const { loadSync } = require("grpc-pbf-loader").packageDefinition;
 
 const { serverInterceptorsFactory } = require("../src/index");
+const serverInterceptor = serverInterceptorsFactory();
 
 const {
   HelloRequest: ServerHelloRequest,
@@ -30,13 +31,15 @@ let server = null;
 /** @type {GreeterClient} */
 let client = null;
 
+grpc.setLogVerbosity(grpc.logVerbosity.ERROR + 1);
+
 /**
  * @returns {import("grpc").Server}
  */
 const createServer = () =>
   new GrpcHostBuilder()
     .useLoggersFactory(() => ({ error: jest.fn() }))
-    .addInterceptor(serverInterceptorsFactory())
+    .addInterceptor(serverInterceptor)
     .addService(packageObject.v1.Greeter.service, {
       sayHello: async call => {
         const request = new ServerHelloRequest(call.request);
@@ -77,6 +80,24 @@ const throwError = async callOptions => {
   await client.throwError(request, null, callOptions);
 };
 
+/**
+ * @param {{[label: string]: string}} labels
+ */
+const verifyMetricsValues = labels => {
+  const metrics = metricsRegistry.getMetricsAsJSON();
+
+  const grpcServerHandledTotal = metrics.find(x => x.name === "grpc_server_handled_total");
+  expect(grpcServerHandledTotal.values).toEqual(expect.arrayContaining([{ value: 1, labels }]));
+
+  const grpcServerHandlingSeconds = metrics.find(x => x.name === "grpc_server_handling_seconds");
+  expect(grpcServerHandlingSeconds.values).toEqual(
+    expect.arrayContaining([
+      { metricName: "grpc_server_handling_seconds_bucket", labels: { ...labels, le: "+Inf" }, value: 1 },
+      { metricName: "grpc_server_handling_seconds_count", labels, value: 1 }
+    ])
+  );
+};
+
 beforeEach(() => {
   server = createServer();
   client = new GreeterClient(grpcBind, grpc.credentials.createInsecure());
@@ -85,6 +106,8 @@ beforeEach(() => {
 afterEach(() => {
   if (client) client.close();
   if (server) server.forceShutdown();
+
+  metricsRegistry.resetMetrics();
 });
 
 test("Must register successful call on the server side", async () => {
@@ -100,16 +123,21 @@ test("Must register successful call on the server side", async () => {
   await sayHello();
 
   // Then
-  const metrics = metricsRegistry.getMetricsAsJSON();
+  verifyMetricsValues(labels);
+});
 
-  const grpcServerHandledTotal = metrics.find(x => x.name === "grpc_server_handled_total");
-  expect(grpcServerHandledTotal.values).toEqual(expect.arrayContaining([{ value: 1, labels }]));
+test("Must register errored call on the server side", async () => {
+  // Given
+  const labels = {
+    grpc_code: "Internal",
+    grpc_method: "ThrowError",
+    grpc_service: "v1.Greeter",
+    grpc_type: "unary"
+  };
 
-  const grpcServerHandlingSeconds = metrics.find(x => x.name === "grpc_server_handling_seconds");
-  expect(grpcServerHandlingSeconds.values).toEqual(
-    expect.arrayContaining([
-      { metricName: "grpc_server_handling_seconds_bucket", labels: { ...labels, le: "+Inf" }, value: 1 },
-      { metricName: "grpc_server_handling_seconds_count", labels, value: 1 }
-    ])
-  );
+  // When
+  await expect(throwError()).rejects.toEqual(new Error("13 INTERNAL: Something went wrong"));
+
+  // Then
+  verifyMetricsValues(labels);
 });
