@@ -1,4 +1,4 @@
-const { status } = require("grpc");
+const { status } = require("@grpc/grpc-js");
 const { Counter, Histogram } = require("prom-client");
 
 const statusesByCodes = new Map([
@@ -18,49 +18,49 @@ const statusesByCodes = new Map([
   [status.INTERNAL, "Internal"],
   [status.UNAVAILABLE, "Unavailable"],
   [status.DATA_LOSS, "DataLoss"],
-  [status.UNAUTHENTICATED, "Unauthenticated"]
+  [status.UNAUTHENTICATED, "Unauthenticated"],
 ]);
 const defaultTimeBuckets = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 10];
 
 /**
  * @param {number[]} timeBuckets
  */
-const configureMetrics = timeBuckets => ({
+const configureMetrics = (timeBuckets) => ({
   grpcServerHandledTotal: new Counter({
     name: "grpc_server_handled_total",
     labelNames: ["grpc_code", "grpc_method", "grpc_service", "grpc_type"],
-    help: "Total number of RPCs completed on the server, regardless of success or failure."
+    help: "Total number of RPCs completed on the server, regardless of success or failure.",
   }),
   grpcServerHandlingSeconds: new Histogram({
     name: "grpc_server_handling_seconds",
     buckets: timeBuckets,
     labelNames: ["grpc_code", "grpc_method", "grpc_service", "grpc_type"],
-    help: "Histogram of response latency (seconds) of gRPC that had been application-level handled by the server."
-  })
+    help: "Histogram of response latency (seconds) of gRPC that had been application-level handled by the server.",
+  }),
 });
 
 /**
  * @param {string} path
  * @returns {{serviceName: string, methodName: string}}
  */
-const parseMethodPath = path => {
+const parseMethodPath = (path) => {
   const [, serviceName, methodName] = path.split("/");
   return { serviceName, methodName };
 };
 
 /**
- * @param {import("grpc").MethodDefinition} methodDefinition
- * @returns {string}
+ * @param {import("@grpc/grpc-js").MethodDefinition} methodDefinition
+ * @returns {"bidi" | "clientStream" | "serverStream" | "unary"}
  */
-const getMethodType = methodDefinition => {
-  if (methodDefinition.requestStream) return methodDefinition.responseStream ? "bidi" : "client_stream";
-  return methodDefinition.responseStream ? "server_stream" : "unary";
+const getMethodType = (methodDefinition) => {
+  if (methodDefinition.requestStream) return methodDefinition.responseStream ? "bidi" : "clientStream";
+  return methodDefinition.responseStream ? "serverStream" : "unary";
 };
 
 /**
  * @param {[number, number]} startTime
  */
-const getElapsedMilliseconds = startTime => {
+const getElapsedMilliseconds = (startTime) => {
   const diff = process.hrtime(startTime);
   return diff[0] * 1e3 + diff[1] * 1e-6;
 };
@@ -68,7 +68,7 @@ const getElapsedMilliseconds = startTime => {
 /**
  * @param {InterceptorsFactoryOptions} [options] Interceptor creation options.
  */
-module.exports = function(options) {
+module.exports = function (options) {
   const opts = options || {};
   const { grpcServerHandledTotal, grpcServerHandlingSeconds } = configureMetrics(
     opts.timeBuckets || defaultTimeBuckets

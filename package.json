@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Interceptor for the server to collect statistics of calls through Prometheus",
   "engines": {
-    "node": ">=8"
+    "node": ">=10.10.0"
   },
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -35,22 +35,21 @@
   },
   "homepage": "https://github.com/litichevskiydv/grpc-prometheus#readme",
   "peerDependencies": {
-    "grpc": "^1.24.2",
+    "@grpc/grpc-js": "^1.2.0",
     "prom-client": "^11.5.3"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.5",
-    "coveralls": "^3.1.0",
-    "grpc": "^1.24.2",
-    "grpc-host-builder": "^4.3.2",
-    "grpc-instrumentum": "^2.0.6",
-    "grpc-pbf-loader": "^1.0.2",
-    "jest": "^26.1.0",
+    "@grpc/grpc-js": "^1.2.12",
+    "@types/jest": "^26.0.22",
+    "grpc-host-builder": "^5.3.3",
+    "grpc-instrumentum": "^3.0.7",
+    "grpc-pbf-loader": "^1.0.4",
+    "jest": "^26.6.3",
     "jest-extended": "^0.11.5",
     "make-dir-cli": "^2.0.0",
     "processing-context": "^1.0.0",
-    "prom-client": "^12.0.0",
-    "protobufjs": "^6.10.1"
+    "prom-client": "^13.1.0",
+    "protobufjs": "^6.10.2"
   },
   "jest": {
     "testEnvironment": "node",
