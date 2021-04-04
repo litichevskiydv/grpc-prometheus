@@ -4,14 +4,14 @@
 [![npm downloads](https://img.shields.io/npm/dt/grpc-prometheus.svg)](https://www.npmjs.com/package/grpc-prometheus)
 [![dependencies](https://img.shields.io/david/litichevskiydv/grpc-prometheus.svg)](https://www.npmjs.com/package/grpc-prometheus)
 [![dev dependencies](https://img.shields.io/david/dev/litichevskiydv/grpc-prometheus.svg)](https://www.npmjs.com/package/grpc-prometheus)
-[![Build Status](https://travis-ci.org/litichevskiydv/grpc-prometheus.svg?branch=master)](https://travis-ci.org/litichevskiydv/grpc-prometheus)
+[![Build Status](https://github.com/litichevskiydv/grpc-prometheus/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/litichevskiydv/grpc-prometheus/actions/workflows/ci.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/litichevskiydv/grpc-prometheus/badge.svg?branch=master)](https://coveralls.io/github/litichevskiydv/grpc-prometheus?branch=master)
 
 Interceptor for the server to collect statistics of calls through Prometheus
 
 # Install
 
-`npm i grpc-opentracing`
+`npm i grpc-prometheus`
 
 # Usage
 
@@ -20,16 +20,16 @@ const { serverInterceptorsFactory } = require("grpc-prometheus");
 
 /*...*/
 
-const server = new GrpcHostBuilder()
+const server = await new GrpcHostBuilder()
   /*...*/
   .addInterceptor(
     serverInterceptorsFactory({
-      timeBuckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 10]
+      timeBuckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 10],
     })
   )
   /*...*/
   .bind(grpcBind)
-  .build();
+  .buildAsync();
 ```
 
 ## Metrics example
