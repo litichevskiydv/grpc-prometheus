@@ -1,6 +1,6 @@
 {
   "name": "grpc-prometheus",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Interceptor for the server to collect statistics of calls through Prometheus",
   "engines": {
     "node": ">=10.10.0"
